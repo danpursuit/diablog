@@ -7,7 +7,7 @@ PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 osascript -e "tell application \"Terminal\" to do script \"cd '$PROJECT_DIR/client' && npm run dev\""
 
 # Open another new macOS Terminal tab and start the backend
-osascript -e "tell application \"Terminal\" to do script \"cd '$PROJECT_DIR/server' && conda activate testingenv && uvicorn main:app --reload\""
+osascript -e "tell application \"Terminal\" to do script \"cd '$PROJECT_DIR/server' && conda activate diablog && uvicorn main:app --reload\""
 
 # Give servers a second to start, then open the app in the browser
 sleep 2
