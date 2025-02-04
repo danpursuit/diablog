@@ -1,0 +1,76 @@
+:root {
+  --cell-padx: 6px;
+}
+
+.row-regular {
+  background-color: #ffffff !important;
+  color: #000000; /* Text color */
+}
+.row-sub {
+  background-color: #f8f8f9 !important;
+  color: #000000;
+}
+.row-not-finalized {
+  background-color: #fff4e6 !important;
+  color: #d9534f; /* Text color for warning */
+}
+.header-rgRow {
+  text-transform: none !important;
+  font-weight: bold;
+}
+.header-content {
+  padding-left: var(--cell-padx);
+  text-align: left;
+}
+
+.focused-rgRow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - 1px);
+  height: calc(100% - 1px);
+  border: 1px solid #3490dc;
+  background-color: #8282ff10;
+  box-sizing: border-box;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.rgCell {
+  padding-right: var(--cell-padx);
+  padding-left: var(--cell-padx);
+  text-align: left;
+}
+
+.edit-input-wrapper > input {
+  padding-right: var(--cell-padx);
+  text-align: right;
+}
+
+/* current solution to reverse padding on select cells, such as buttons */
+.forceExtend {
+  position: relative;
+  left: calc(-1 * var(--cell-padx));
+  width: calc(100% + 2 * var(--cell-padx));
+}
+
+.compute {
+  background-color: #a2a2ff30;
+  padding-left: var(--cell-padx);
+  padding-right: var(--cell-padx);
+  position: relative;
+  left: calc(-1 * var(--cell-padx));
+  width: calc(100% + 2 * var(--cell-padx));
+}
+.compute-num {
+  text-align: right;
+}
+
+revogr-viewport-scroll {
+  overflow-y: auto;
+}
+revogr-viewport-scroll .content-wrapper {
+  overflow: auto;
+  min-height: 1000px;
+}

@@ -1,0 +1,17 @@
+export enum ColumnProps {
+  ACTIONS = "actions",
+  DATE = "date",
+  ROW_TYPE = "rowType",
+  IN_AMOUNT = "inAmount",
+  IN_CURRENCY = "inCurrency",
+  OUT_AMOUNT = "outAmount",
+  OUT_CURRENCY = "outCurrency",
+  FEE_AMOUNT = "feeAmount",
+  FEE_CURRENCY = "feeCurrency",
+  USD_VALUE = "usdValue",
+  FINALIZED = "finalized",
+  NOTE = "note",
+  NETWORK = "network",
+  TAGS = "tags",
+  COMPUTED = "computed",
+}

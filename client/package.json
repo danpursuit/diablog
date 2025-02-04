@@ -1,0 +1,41 @@
+{
+  "name": "diablog-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build"
+  },
+  "dependencies": {
+    "@revolist/revogrid-column-date": "^2.0.24",
+    "@revolist/revogrid-column-numeral": "^2.0.3",
+    "@revolist/revogrid-column-select": "^3.1.8",
+    "@revolist/vue3-datagrid": "^4.11.11",
+    "@vueuse/components": "^12.4.0",
+    "@vueuse/core": "^12.4.0",
+    "gsap": "^3.12.7",
+    "lucide-vue-next": "^0.471.0",
+    "numeral": "^2.0.6",
+    "vue": "^3.5.13",
+    "vue3-draggable": "^2.0.9",
+    "vuedraggable": "^2.24.3"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.0",
+    "@types/node": "^22.10.2",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/tsconfig": "^0.7.0",
+    "autoprefixer": "^10.4.20",
+    "npm-run-all2": "^7.0.2",
+    "postcss": "^8.5.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.6.3",
+    "vite": "^6.0.5",
+    "vite-plugin-vue-devtools": "^7.6.8",
+    "vue-tsc": "^2.1.10"
+  }
+}
