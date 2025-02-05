@@ -23,7 +23,7 @@
           :key="item.name"
           @click="selectItem(item)"
           @mouseover="highlightedIndex = index"
-          class="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
+          class="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors text-gray-900"
           :class="{ 'bg-blue-50': index === highlightedIndex }">
           {{ item.name }}
         </div>

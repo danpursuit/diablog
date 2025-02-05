@@ -74,3 +74,6 @@ revogr-viewport-scroll .content-wrapper {
   overflow: auto;
   min-height: 1000px;
 }
+input {
+  color: #4b5563 !important; /* this is for external users with weird style */
+}
