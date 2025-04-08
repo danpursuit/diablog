@@ -223,6 +223,18 @@ const columns = [
     searchTerms: currencySearchTerms.value,
   },
   {
+    prop: ColumnProps.FEE_AMOUNT,
+    name: "Fee Amount",
+    columnType: "feeNumeric",
+  },
+  {
+    prop: ColumnProps.FEE_CURRENCY,
+    name: "Fee Currency",
+    editor: CURRENCY_EDITOR,
+    searchTerms: feeSearchTerms.value,
+    size: 90,
+  },
+  {
     prop: ColumnProps.USD_VALUE,
     name: "USD Value",
     columnType: "numeric",
@@ -337,18 +349,6 @@ const columns = [
     prop: ColumnProps.NOTE,
     name: "Note",
     size: 200,
-  },
-  {
-    prop: ColumnProps.FEE_AMOUNT,
-    name: "Fee Amount",
-    columnType: "feeNumeric",
-  },
-  {
-    prop: ColumnProps.FEE_CURRENCY,
-    name: "Fee Currency",
-    editor: CURRENCY_EDITOR,
-    searchTerms: feeSearchTerms.value,
-    size: 90,
   },
 ];
 //////////////////////////////
