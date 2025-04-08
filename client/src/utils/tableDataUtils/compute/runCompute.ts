@@ -112,7 +112,6 @@ const computeRow = (
     if (!allCumData[cur]) allCumData[cur] = new CumCurCompute(cur);
     const curCompute = calculateRowCurCompute(cur, row, allCumData[cur]);
     compute.curData[cur] = curCompute;
-    // console.log("curCompute", curCompute);
   });
   row.compute = compute;
 };

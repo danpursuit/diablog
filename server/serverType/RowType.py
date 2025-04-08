@@ -5,6 +5,7 @@ class RowType(str, Enum):
     TRADE = "Trade"
     BRIDGEIN = "Bridge In"
     BRIDGEOUT = "Bridge Out"
+    INIT = "Initiate"
     REWARD = "Reward"
     LOSS = "Loss"
     subEXTRAOUT = "↪extraOut"

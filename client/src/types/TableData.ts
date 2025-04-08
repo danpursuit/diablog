@@ -1,3 +1,4 @@
+import type { DateFilterValue } from "./DateTypes";
 import type { RowFilter } from "./RowFilter";
 import type { TransactionRow } from "./TransactionRow";
 
@@ -11,4 +12,7 @@ export interface TableData {
   netOwned: { [key: string]: number };
   netBorrowed: { [key: string]: number };
   lastTradePrices: { [key: string]: number };
+
+  // local filters and settings
+  dateRange: [DateFilterValue, DateFilterValue];
 }

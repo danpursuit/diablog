@@ -111,7 +111,8 @@ export class CumCurCompute implements CumCurComputeType {
     return this.aBought - this.aSold + this.totalBorrowed + this.netBridged;
   }
   get netAmount(): number {
-    return this.aBought - this.aSold;
+    // this is your total exposure to coin $ change
+    return this.aBought - this.aSold + this.netBridged;
   }
 
   get totalBorrowed(): number {
@@ -126,6 +127,10 @@ export class CumCurCompute implements CumCurComputeType {
       this.ownedByNetwork[network] += amount;
     } else {
       this.ownedByNetwork[network] = amount;
+    }
+    console.log(`addToNetwork ${network} ${amount}`);
+    if (this.cur === "SHOGGOTH") {
+      console.log(`addToNetwork ${network} ${amount}`);
     }
   }
   amountInNetwork(network: string): number {

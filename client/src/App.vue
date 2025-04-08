@@ -67,9 +67,12 @@ import PricesDisplay from "./components/pricesDisplay.vue";
 import { Currency } from "./utils/currencies";
 import NetWorthDisplay from "./components/netWorthDisplay.vue";
 import FlipPnlSwitch from "./components/actionsHud/flipPnlSwitch.vue";
-import NumberSumWidget from "./components/NumberSumWidget.vue";
+import NumberSumWidget from "./components/numberSumWidget/NumberSumWidget.vue";
 import AutocompleteBar from "./components/autocompleteBar/AutocompleteBar.vue";
 import { useCoinsStore, type SelectableCoin } from "./stores/coinsStore";
+import DateRangeSelector from "./components/dateRangePicker/dateRangeSelector.vue";
+import type { DateFilterValue } from "./types/DateTypes";
+import DynamicNumberSum from "./components/numberSumWidget/DynamicNumberSum.vue";
 
 // Add ref for storing deleted rows
 const deletedRows = ref<TransactionRow[]>([]);
@@ -113,6 +116,7 @@ const tableData = reactive<TableData>({
   netOwned: {},
   netBorrowed: {},
   lastTradePrices: {},
+  dateRange: [null, null],
 });
 // Search terms for currency and fee columns
 const currencySearchTerms = ref<string[]>([]);
@@ -219,18 +223,6 @@ const columns = [
     searchTerms: currencySearchTerms.value,
   },
   {
-    prop: ColumnProps.FEE_AMOUNT,
-    name: "Fee Amount",
-    columnType: "feeNumeric",
-  },
-  {
-    prop: ColumnProps.FEE_CURRENCY,
-    name: "Fee Currency",
-    editor: CURRENCY_EDITOR,
-    searchTerms: feeSearchTerms.value,
-    size: 90,
-  },
-  {
     prop: ColumnProps.USD_VALUE,
     name: "USD Value",
     columnType: "numeric",
@@ -259,6 +251,7 @@ const columns = [
     readonly: true,
     cellTemplate: VGridVueTemplate(FlexibleComputeCell),
     flippedCoins: flippedCoins,
+    focusCoins: coins,
     computeProperty: "price",
   },
   {
@@ -268,6 +261,7 @@ const columns = [
     // cellTemplate: VGridVueTemplate(ComputedAvgPriceCell),
     cellTemplate: VGridVueTemplate(FlexibleComputeCell),
     flippedCoins: flippedCoins,
+    focusCoins: coins,
     computeProperty: "avgPrice",
   },
   {
@@ -277,6 +271,7 @@ const columns = [
     // cellTemplate: VGridVueTemplate(ComputedPnlCell),
     cellTemplate: VGridVueTemplate(FlexibleComputeCell),
     flippedCoins: flippedCoins,
+    focusCoins: coins,
     computeProperty: "pnl",
     numberFormat: "0,0.0[00]",
   },
@@ -287,6 +282,7 @@ const columns = [
     // cellTemplate: VGridVueTemplate(ComputedCumPnlCell),
     cellTemplate: VGridVueTemplate(FlexibleComputeCell),
     flippedCoins: flippedCoins,
+    focusCoins: coins,
     computeProperty: "cumPnl",
     numberFormat: "0,0.0[00]",
   },
@@ -298,7 +294,11 @@ const columns = [
     // cellTemplate: VGridVueTemplate(FlexibleComputeCell),
     cellTemplate: VGridVueTemplate(RedIfNegativeComputeCell),
     flippedCoins: flippedCoins,
+    focusCoins: coins,
     computeProperty: "cumAmount",
+    // it's ok to have less own than borrowed (means you're short)
+    // but, for pnl computation, when you eventually buy, should be a "rebuy" that fixes this
+    compareProperty: "amountBorrowed",
     numberFormat: "0,0.0[000000]",
   },
   {
@@ -309,6 +309,7 @@ const columns = [
     // cellTemplate: VGridVueTemplate(FlexibleComputeCell),
     cellTemplate: VGridVueTemplate(RedIfNegativeComputeCell),
     flippedCoins: flippedCoins,
+    focusCoins: coins,
     computeProperty: "amountBorrowed",
     numberFormat: "0,0.0[000000]",
   },
@@ -320,6 +321,7 @@ const columns = [
     readonly: true,
     cellTemplate: VGridVueTemplate(RedIfNegativeComputeCell),
     flippedCoins: flippedCoins,
+    focusCoins: coins,
     computeProperty: "amountInNetwork",
     numberFormat: "0,0.0[000000]",
   },
@@ -329,11 +331,24 @@ const columns = [
     readonly: true,
     cellTemplate: VGridVueTemplate(ComputedCurrencyCell),
     flippedCoins: flippedCoins,
+    focusCoins: coins,
   },
   {
     prop: ColumnProps.NOTE,
     name: "Note",
     size: 200,
+  },
+  {
+    prop: ColumnProps.FEE_AMOUNT,
+    name: "Fee Amount",
+    columnType: "feeNumeric",
+  },
+  {
+    prop: ColumnProps.FEE_CURRENCY,
+    name: "Fee Currency",
+    editor: CURRENCY_EDITOR,
+    searchTerms: feeSearchTerms.value,
+    size: 90,
   },
 ];
 //////////////////////////////
@@ -484,6 +499,10 @@ const updateCategories = (newValue: DraggableTag[]) => {
     return;
   }
   setTableFilters([...oldFilters, ...newFilters]);
+};
+const updateDateRange = (newRange: [DateFilterValue, DateFilterValue]) => {
+  tableData.dateRange = newRange;
+  recomputeTableOnly();
 };
 // handle selectable Coins
 const updateCoins = (newValue: SelectableCoin[]) => {
@@ -681,14 +700,15 @@ watch(
 
 <template>
   <div class="flex flex-col w-full">
-    <NetWorthDisplay
-      :key="rerenderNetworth"
-      :manualPrices="manualPrices"
-      :tableData="tableData" />
     <PricesDisplay
       :tableData="tableData"
       :manualPrices="manualPrices"
       :updateManualPrice="updatePrice" />
+    <NetWorthDisplay
+      :key="rerenderNetworth"
+      :manualPrices="manualPrices"
+      :tableData="tableData" />
+    <DynamicNumberSum />
     <HudWrapper>
       <UndoButton
         :msg="undoMsg"
@@ -730,6 +750,10 @@ watch(
       @beforekeydown="handleBeforeKeyDown"
       @focuscell="handleFocus" />
     <AddRowButton :action="addNewRowOnly">Add New Row</AddRowButton>
+    <DateRangeSelector
+      :rows="tableData.rowsDisplayed"
+      :dateRange="tableData.dateRange"
+      @update:dateRange="updateDateRange" />
     <NetworkBar
       :name="`Network`"
       :items="networks"

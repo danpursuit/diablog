@@ -92,7 +92,11 @@ const selectItem = (item) => {
   const updatedItems = [...props.items];
   const index = updatedItems.findIndex((i) => i.name === item.name);
   if (index !== -1) {
-    updatedItems[index] = { ...updatedItems[index], selected: true };
+    // resort to put it in front
+    updatedItems.splice(index, 1);
+    updatedItems.unshift({ ...item, selected: true });
+
+    // updatedItems[0] = { ...updatedItems[index], selected: true };
     emit("update:items", updatedItems);
     searchQuery.value = "";
     highlightedIndex.value = -1;

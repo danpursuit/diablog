@@ -10,6 +10,8 @@ const initialItems: DraggableCat[] = [
   { name: "All", selected: true },
   { name: "Trades", selected: false },
   { name: "Loans", selected: false },
+  { name: "Bridge In", selected: false },
+  { name: "Bridge Out", selected: false },
 ];
 
 const loadItems = () => {

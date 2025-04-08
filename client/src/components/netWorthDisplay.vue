@@ -19,11 +19,9 @@
             }">
             {{ mode.label }}
           </button>
-          <!-- Updated Tooltip Position -->
           <div
             class="absolute left-0 top-full mt-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
             {{ mode.description }}
-            <!-- Tooltip Arrow (now on upper left) -->
             <div
               class="absolute left-4 top-0 -translate-y-full w-0 h-0 border-x-8 border-x-transparent border-b-8 border-b-gray-800"></div>
           </div>
@@ -41,7 +39,7 @@
       </div>
 
       <div
-        v-for="(amount, stock) in tableData.netOwned"
+        v-for="stock in sortedCoins"
         :key="stock"
         class="flex justify-between items-center bg-white p-3 rounded-md">
         <span class="font-medium text-gray-700">{{ stock }}:&nbsp;</span>
@@ -49,22 +47,20 @@
         <!-- Simple Mode -->
         <div v-if="currentDisplayMode === 'simple'" class="text-right">
           <span class="font-medium text-green-600">
-            {{ numeral(calculateSimpleOwned(stock)).format("0,0.00[000000]") }}
+            {{ formatNumber(calculateSimpleOwned(stock), "0,0.00[0]") }}
           </span>
           <span class="font-bold text-blue-600 ml-2">
-            ${{ numeral(calculateSimpleValue(stock)).format("0,0.00") }}
+            ${{ formatNumber(calculateSimpleValue(stock), "0,0.00") }}
           </span>
         </div>
 
         <!-- Regular Mode -->
         <div v-else-if="currentDisplayMode === 'regular'" class="text-right">
           <span class="font-medium" :class="getAmountColor(stock)">
-            {{
-              numeral(props.tableData.netOwned[stock]).format("0,0.00[000000]")
-            }}
+            {{ formatNumber(props.tableData.netOwned[stock], "0,0.00[0]") }}
           </span>
           <span class="font-bold ml-2" :class="getDollarColor(stock)">
-            ${{ numeral(calculateNetValue(stock)).format("0,0.00") }}
+            ${{ formatNumber(calculateNetValue(stock), "0,0.00") }}
           </span>
         </div>
 
@@ -72,12 +68,10 @@
         <div v-else class="text-right flex flex-col">
           <div class="flex items-center justify-end">
             <span class="text-green-600 font-medium">
-              {{
-                numeral(calculateSimpleOwned(stock)).format("0,0.00[000000]")
-              }}
+              {{ formatNumber(calculateSimpleOwned(stock), "0,0.00[0]") }}
             </span>
             <span class="text-blue-600 font-bold ml-2">
-              ${{ numeral(calculateSimpleValue(stock)).format("0,0.00") }}
+              ${{ formatNumber(calculateSimpleValue(stock), "0,0.00") }}
             </span>
           </div>
 
@@ -86,13 +80,14 @@
             class="flex items-center justify-end">
             <span class="text-red-600 font-medium">
               -{{
-                numeral(props.tableData.netBorrowed[stock]).format(
+                formatNumber(
+                  props.tableData.netBorrowed[stock],
                   "0,0.00[000000]"
                 )
               }}
             </span>
             <span class="text-red-600 font-bold ml-2">
-              -${{ numeral(calculateBorrowedValue(stock)).format("0,0.00") }}
+              -${{ formatNumber(calculateBorrowedValue(stock), "0,0.00") }}
             </span>
           </div>
 
@@ -101,13 +96,11 @@
             class="flex items-center justify-end border-t border-gray-200 mt-1 pt-1">
             <span class="font-medium" :class="getAmountColor(stock)">
               {{
-                numeral(props.tableData.netOwned[stock]).format(
-                  "0,0.00[000000]"
-                )
+                formatNumber(props.tableData.netOwned[stock], "0,0.00[000000]")
               }}
             </span>
             <span class="font-bold ml-2" :class="getDollarColor(stock)">
-              ${{ numeral(calculateNetValue(stock)).format("0,0.00") }}
+              ${{ formatNumber(calculateNetValue(stock), "0,0.00") }}
             </span>
           </div>
         </div>
@@ -120,6 +113,7 @@
 import { Currency } from "@/utils/currencies";
 import { computed, defineProps, ref } from "vue";
 import numeral from "numeral";
+import { formatNumber } from "@/utils/numberFormatting";
 
 const props = defineProps({
   manualPrices: {
@@ -158,20 +152,20 @@ const getPrice = (stock) => {
     : props.manualPrices[stock] || props.tableData.lastTradePrices[stock];
 };
 
-// "net": does not include borrowed
 const calculateNetAmount = (stock) => {
   return props.tableData.netOwned[stock];
 };
+
 const calculateNetValue = (stock) => {
   return getPrice(stock) * calculateNetAmount(stock);
 };
 
-// "simple": use net + borrowed
 const calculateSimpleOwned = (stock) => {
   return (
     props.tableData.netOwned[stock] + (props.tableData.netBorrowed[stock] || 0)
   );
 };
+
 const calculateSimpleValue = (stock) => {
   return getPrice(stock) * calculateSimpleOwned(stock);
 };
@@ -179,7 +173,7 @@ const calculateSimpleValue = (stock) => {
 const calculateBorrowedValue = (stock) => {
   return getPrice(stock) * (props.tableData.netBorrowed[stock] || 0);
 };
-// Split the color logic into two functions for amounts and dollar values
+
 const getAmountColor = (stock) => {
   const netAmount = calculateNetAmount(stock);
   return {
@@ -197,6 +191,21 @@ const getDollarColor = (stock) => {
     "text-gray-600": netAmount === 0,
   };
 };
+
+// New computed property to sort coins by value
+const sortedCoins = computed(() => {
+  return Object.keys(props.tableData.netOwned).sort((a, b) => {
+    const valueA =
+      currentDisplayMode.value === "simple"
+        ? calculateSimpleValue(a)
+        : calculateNetValue(a);
+    const valueB =
+      currentDisplayMode.value === "simple"
+        ? calculateSimpleValue(b)
+        : calculateNetValue(b);
+    return valueB - valueA; // Sort in descending order
+  });
+});
 
 const getTotalValue = computed(() => {
   if (currentDisplayMode.value === "simple") {

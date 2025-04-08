@@ -127,6 +127,12 @@ export const recomputeRows = (tableData: TableData): TableData => {
     const allowLoan = categoryFilters.some(
       (filter) => filter.value === "Loans"
     );
+    const allowBridgeIn = categoryFilters.some(
+      (filter) => filter.value === "Bridge In"
+    );
+    const allowBridgeOut = categoryFilters.some(
+      (filter) => filter.value === "Bridge Out"
+    );
     rowsDisplayed = rowsDisplayed.filter((row) => {
       if (
         allowTrade &&
@@ -143,6 +149,12 @@ export const recomputeRows = (tableData: TableData): TableData => {
       ) {
         return true;
       }
+      if (allowBridgeIn && row.rowType === RowType.BRIDGEIN) {
+        return true;
+      }
+      if (allowBridgeOut && row.rowType === RowType.BRIDGEOUT) {
+        return true;
+      }
       return false;
     });
   }
@@ -156,6 +168,25 @@ export const recomputeRows = (tableData: TableData): TableData => {
         (filter) =>
           row.inCurrency === filter.value || row.outCurrency === filter.value
       );
+    });
+  }
+  // dateRange filters
+  const minDate = tableData.dateRange[0];
+  if (minDate !== null) {
+    // start date
+    rowsDisplayed = rowsDisplayed.filter(
+      (row) => new Date(row.date) >= minDate
+    );
+  }
+  const maxDate = tableData.dateRange[1];
+  if (maxDate !== null) {
+    // end date
+    rowsDisplayed = rowsDisplayed.filter(
+      (row) => new Date(row.date) <= maxDate
+    );
+    // log dates
+    rowsDisplayed.forEach((row) => {
+      console.log("row.date", row.date, new Date(row.date), maxDate);
     });
   }
 

@@ -9,6 +9,18 @@ export interface ValidationResult {
   reason: string;
 }
 
+const _checkFieldsExist = (
+  row: TransactionRow,
+  requiredFields: string[]
+): ValidationResult => {
+  for (const field of requiredFields) {
+    if (!row[field as keyof TransactionRow]) {
+      return { valid: false, reason: `${field} is required` };
+    }
+  }
+  return { valid: true, reason: "" };
+};
+
 const _checkFieldsEmpty = (
   row: TransactionRow,
   notAllowedFields: string[]
@@ -69,18 +81,13 @@ export const validateRow = (
   // outAmount is required
   // outCurrency is required
   if (row.rowType === RowType.TRADE || row.rowType === RowType.subREBUY) {
-    if (!row.inAmount) {
-      return { valid: false, reason: "inAmount is required" };
-    }
-    if (!row.inCurrency) {
-      return { valid: false, reason: "inCurrency is required" };
-    }
-    if (!row.outAmount) {
-      return { valid: false, reason: "outAmount is required" };
-    }
-    if (!row.outCurrency) {
-      return { valid: false, reason: "outCurrency is required" };
-    }
+    const result0 = _checkFieldsExist(row, [
+      "inAmount",
+      "inCurrency",
+      "outAmount",
+      "outCurrency",
+    ]);
+    if (!result0.valid) return result0;
     // extra validations for subRebuy that were skpped
     // usdValue is required
     if (row.rowType === RowType.subREBUY && row.usdValue === null) {
@@ -88,29 +95,26 @@ export const validateRow = (
     }
   }
 
+  // Init: temp disable, as bridgeIn is enough
+  // inAmount is required
+  // inCurrency is required
+  // out fields are not allowed
+  // if (row.rowType === RowType.INIT) {
+  //   const result0 = _checkFieldsExist(row, ["inAmount", "inCurrency"]);
+  //   if (!result0.valid) return result0;
+  //   const result1 = _checkFieldsEmpty(row, ["outAmount", "outCurrency"]);
+  //   if (!result1.valid) return result1;
+  // }
+
   // bridgeIn:
   // inAmount is required
   // inCurrency is required
   // out fields are not allowed
   if (row.rowType === RowType.BRIDGEIN) {
-    if (!row.inAmount) {
-      return { valid: false, reason: "inAmount is required" };
-    }
-    if (!row.inCurrency) {
-      return { valid: false, reason: "inCurrency is required" };
-    }
-    const notAllowedFields = [
-      "outAmount",
-      "outCurrency",
-    ] as (keyof TransactionRow)[];
-    for (const field of notAllowedFields) {
-      if (row[field]) {
-        return {
-          valid: false,
-          reason: `${field} is not allowed in ${row.rowType}`,
-        };
-      }
-    }
+    const result0 = _checkFieldsExist(row, ["inAmount", "inCurrency"]);
+    if (!result0.valid) return result0;
+    const result1 = _checkFieldsEmpty(row, ["outAmount", "outCurrency"]);
+    if (!result1.valid) return result1;
   }
 
   // bridgeOut:
@@ -118,24 +122,10 @@ export const validateRow = (
   // outCurrency is required
   // in fields are not allowed
   if (row.rowType === RowType.BRIDGEOUT) {
-    if (!row.outAmount) {
-      return { valid: false, reason: "outAmount is required" };
-    }
-    if (!row.outCurrency) {
-      return { valid: false, reason: "outCurrency is required" };
-    }
-    const notAllowedFields = [
-      "inAmount",
-      "inCurrency",
-    ] as (keyof TransactionRow)[];
-    for (const field of notAllowedFields) {
-      if (row[field]) {
-        return {
-          valid: false,
-          reason: `${field} is not allowed in ${row.rowType}`,
-        };
-      }
-    }
+    const result0 = _checkFieldsExist(row, ["outAmount", "outCurrency"]);
+    if (!result0.valid) return result0;
+    const result1 = _checkFieldsEmpty(row, ["inAmount", "inCurrency"]);
+    if (!result1.valid) return result1;
   }
 
   // reward:
@@ -143,14 +133,10 @@ export const validateRow = (
   // inCurrency is required
   // out fields are not allowed
   if (row.rowType === RowType.REWARD) {
-    if (!row.inAmount) {
-      return { valid: false, reason: "inAmount is required" };
-    }
-    if (!row.inCurrency) {
-      return { valid: false, reason: "inCurrency is required" };
-    }
-    const result = _checkFieldsEmpty(row, ["outAmount", "outCurrency"]);
-    if (!result.valid) return result;
+    const result0 = _checkFieldsExist(row, ["inAmount", "inCurrency"]);
+    if (!result0.valid) return result0;
+    const result1 = _checkFieldsEmpty(row, ["outAmount", "outCurrency"]);
+    if (!result1.valid) return result1;
   }
 
   // loss:
@@ -158,14 +144,10 @@ export const validateRow = (
   // outCurrency is required
   // in fields are not allowed
   if (row.rowType === RowType.LOSS) {
-    if (!row.outAmount) {
-      return { valid: false, reason: "outAmount is required" };
-    }
-    if (!row.outCurrency) {
-      return { valid: false, reason: "outCurrency is required" };
-    }
-    const result = _checkFieldsEmpty(row, ["inAmount", "inCurrency"]);
-    if (!result.valid) return result;
+    const result0 = _checkFieldsExist(row, ["outAmount", "outCurrency"]);
+    if (!result0.valid) return result0;
+    const result1 = _checkFieldsEmpty(row, ["inAmount", "inCurrency"]);
+    if (!result1.valid) return result1;
   }
 
   // borrow:
@@ -173,14 +155,10 @@ export const validateRow = (
   // inCurrency is required
   // out fields are not allowed
   if (row.rowType === RowType.BORROW) {
-    if (!row.inAmount) {
-      return { valid: false, reason: "inAmount is required" };
-    }
-    if (!row.inCurrency) {
-      return { valid: false, reason: "inCurrency is required" };
-    }
-    const result = _checkFieldsEmpty(row, ["outAmount", "outCurrency"]);
-    if (!result.valid) return result;
+    const result0 = _checkFieldsExist(row, ["inAmount", "inCurrency"]);
+    if (!result0.valid) return result0;
+    const result1 = _checkFieldsEmpty(row, ["outAmount", "outCurrency"]);
+    if (!result1.valid) return result1;
   }
 
   // repay (same as subprinciple)
@@ -188,14 +166,10 @@ export const validateRow = (
   // outCurrency is required
   // in fields are not allowed
   if (row.rowType === RowType.REPAY || row.rowType === RowType.subPRINCIPLE) {
-    if (!row.outAmount) {
-      return { valid: false, reason: "outAmount is required" };
-    }
-    if (!row.outCurrency) {
-      return { valid: false, reason: "outCurrency is required" };
-    }
-    const result = _checkFieldsEmpty(row, ["inAmount", "inCurrency"]);
-    if (!result.valid) return result;
+    const result0 = _checkFieldsExist(row, ["outAmount", "outCurrency"]);
+    if (!result0.valid) return result0;
+    const result1 = _checkFieldsEmpty(row, ["inAmount", "inCurrency"]);
+    if (!result1.valid) return result1;
   }
 
   // interest
@@ -204,14 +178,10 @@ export const validateRow = (
   // in fields are not allowed
   // usdValue is required
   if (row.rowType === RowType.subINTEREST) {
-    if (!row.outAmount) {
-      return { valid: false, reason: "outAmount is required" };
-    }
-    if (!row.outCurrency) {
-      return { valid: false, reason: "outCurrency is required" };
-    }
-    const result = _checkFieldsEmpty(row, ["inAmount", "inCurrency"]);
-    if (!result.valid) return result;
+    const result0 = _checkFieldsExist(row, ["outAmount", "outCurrency"]);
+    if (!result0.valid) return result0;
+    const result1 = _checkFieldsEmpty(row, ["inAmount", "inCurrency"]);
+    if (!result1.valid) return result1;
   }
 
   // below: we have disabled some subrows for now

@@ -27,14 +27,6 @@ export const handleBridgeIn = (
     cumData,
     row
   );
-  // return {
-  //   price: (row.usdValue || 0) / amount,
-  //   avgPrice: cumData.avgPrice,
-  //   pnl: 0,
-  //   cumPnl: cumData.cumPnl(),
-  //   cumAmount: cumData.cumAmount,
-  //   amountInNetwork: cumData.amountInNetwork(row.network),
-  // };
 };
 
 export const handleBridgeOut = (
@@ -64,3 +56,23 @@ export const handleBridgeOut = (
   //   amountInNetwork: cumData.amountInNetwork(row.network),
   // };
 };
+
+// export const handleInitiate = (
+//   cur: string,
+//   row: TransactionRow,
+//   cumData: CumCurCompute
+// ): RowCurCompute => {
+//   if (row.rowType !== RowType.INIT)
+//     throw new Error(`rowType ${row.rowType} not INIT`);
+//   if (row.inCurrency !== cur)
+//     throw new Error(`inCurrency ${row.inCurrency} not ${cur}`);
+
+//   const amount = row.inAmount || 0;
+//   cumData.handleBridge(amount, row.network);
+//   // cumData.addToNetwork(row.network, amount);
+//   return createRowCurCompute(
+//     { price: (row.usdValue || 0) / amount, pnl: 0 },
+//     cumData,
+//     row
+//   );
+// };
