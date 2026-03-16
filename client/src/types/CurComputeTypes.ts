@@ -128,10 +128,6 @@ export class CumCurCompute implements CumCurComputeType {
     } else {
       this.ownedByNetwork[network] = amount;
     }
-    console.log(`addToNetwork ${network} ${amount}`);
-    if (this.cur === "SHOGGOTH") {
-      console.log(`addToNetwork ${network} ${amount}`);
-    }
   }
   amountInNetwork(network: string): number {
     return (
@@ -189,6 +185,18 @@ export class CumCurCompute implements CumCurComputeType {
     // realize PNL
     const buyPrice = this.rollingSpent / this.rollingBought;
     const sellPrice = value / amount;
+    if (this.cur === "SHIB") {
+      // check if value is nan
+      if (isNaN(buyPrice)) {
+        console.log(
+          "value is NaN",
+          buyPrice,
+          this.rollingSpent,
+          this.rollingBought
+        );
+      }
+      console.log("handleSell", amount, value, buyPrice, sellPrice);
+    }
     const pnl = (sellPrice - buyPrice) * amount;
     this.realizedPnl += pnl;
 
